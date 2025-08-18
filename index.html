@@ -1,70 +1,143 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exemplo de Mostrar Senha</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .container {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 300px;
-    }
-    input[type="password"], input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gerador de Senhas</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #0f172a;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .container {
+    background-color: #1e293b;
+    padding: 24px;
+    border-radius: 12px;
+    max-width: 350px;
+    width: 100%;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  }
+  h1 {
+    font-size: 20px;
+    margin-top: 0;
+    margin-bottom: 16px;
+    text-align: center;
+    color: #38bdf8;
+  }
+  .field {
+    display: flex;
+    align-items: center;
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 8px;
+  }
+  input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e2e8f0;
+    font-size: 16px;
+    letter-spacing: 1px;
+  }
+  button {
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    color: #0f172a;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 12px;
+    width: 100%;
+    font-size: 15px;
+  }
+  label {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    margin-top: 10px;
+    color: #94a3b8;
+  }
+  label input {
+    margin-right: 6px;
+  }
+  .copiado {
+    font-size: 13px;
+    color: #4ade80;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .copiado.show {
+    opacity: 1;
+  }
+</style>
 </head>
 <body>
-
   <div class="container">
-    <h2>Login</h2>
-    <input type="text" placeholder="Usuário">
-    <input type="password" id="senha" placeholder="Senha">
-    
-    <!-- Apenas esta parte foi modificada -->
-    <label style="display:inline-flex; align-items:center; gap:2px !important; font-size:14px;">
-      <input type="checkbox" id="mostrar" style="margin:0 !important">
-      Mostrar senha
-    </label>
-    
-    <button>Entrar</button>
+    <h1>Gerador de Senhas</h1>
+    <div class="field">
+      <input id="senha" type="password" placeholder="Clique para gerar" readonly />
+    </div>
+    <label><input type="checkbox" id="mostrar">Mostrar senha</label>
+    <button id="gerar">Gerar Senha</button>
+    <div id="mensagem" class="copiado">Senha copiada!</div>
   </div>
 
-  <script>
-    const checkbox = document.getElementById('mostrar');
-    const senha = document.getElementById('senha');
+<script>
+  const senhaEl = document.getElementById("senha");
+  const mostrarEl = document.getElementById("mostrar");
+  const gerarEl = document.getElementById("gerar");
+  const msgEl = document.getElementById("mensagem");
 
-    checkbox.addEventListener('change', () => {
-      senha.type = checkbox.checked ? 'text' : 'password';
-    });
-  </script>
+  const LENGTH = 16;
+  const CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*!";
 
+  function gerarSenha() {
+    let senha = "";
+    for (let i = 0; i < LENGTH; i++) {
+      const random = Math.floor(Math.random() * CHARSET.length);
+      senha += CHARSET[random];
+    }
+    return senha;
+  }
+
+  async function copiarParaArea(texto) {
+    try {
+      await navigator.clipboard.writeText(texto);
+      return true;
+    } catch {
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = texto;
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    }
+  }
+
+  gerarEl.addEventListener("click", async () => {
+    const novaSenha = gerarSenha();
+    senhaEl.value = novaSenha;
+    if (await copiarParaArea(novaSenha)) {
+      msgEl.classList.add("show");
+      setTimeout(() => msgEl.classList.remove("show"), 1500);
+    }
+  });
+
+  mostrarEl.addEventListener("change", () => {
+    senhaEl.type = mostrarEl.checked ? "text" : "password";
+  });
+</script>
 </body>
 </html>
