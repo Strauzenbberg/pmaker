@@ -146,7 +146,7 @@ label input {
   <script>
 (function () {
   var NAMESPACE = 'meu-portfolio';
-  var KEY = 'home'; // troque se quiser contagem por página
+  var KEY = location.pathname; // usa o caminho da URL como identificador
 
   function render(n) {
     var id = 'visit-counter-badge';
@@ -177,6 +177,7 @@ label input {
 
 </body>
 </html>
+
 
 
 
